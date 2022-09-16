@@ -1,5 +1,4 @@
 const express = require('express');
-const { NextBtn } = require('../../frontend/src/components/Home/Banner/Banner');
 const { getAllProducts, getProductDetails, updateProduct, deleteProduct, getProductReviews, deleteReview, createProductReview, createProduct, getAdminProducts, getProducts } = require('../controllers/productController');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 const Product = require('../models/productModel')
@@ -16,14 +15,14 @@ router.route('/admin/product/:id')
     .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
 
 router.route('/product/:id').get(getProductDetails);
-router.route('/updatebid',(req,res,next)=>{
-    try{
-        // update
-    }
-    catch(err){
-        next(err);
-    }
-})
+// router.route('/updatebid',(req,res,next)=>{
+//     try{
+//         // update
+//     }
+//     catch(err){
+//         next(err);
+//     }
+// })
 
 router.route('/review').put(isAuthenticatedUser, createProductReview);
 
