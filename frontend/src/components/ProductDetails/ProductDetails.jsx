@@ -58,7 +58,6 @@ const ProductDetails = () => {
   );
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
-  console.log(product);
 
   const settings = {
     autoplay: true,
@@ -119,6 +118,7 @@ const ProductDetails = () => {
   };
 
   const bid = async ()=>{
+    console.log("function call")
     const datas = {productId:productId,bidVal:price};
     console.log(datas,"data")
     const options = {
@@ -126,10 +126,32 @@ const ProductDetails = () => {
         headers: {'Content-Type': 'application/json'},
         body:JSON.stringify(datas),
     }
-    const data = await fetch('/updatebid',options);
+    const data = await fetch('/api/v1/updatebid',options);
     const parsedData = await data.json();
     console.log(parsedData);
   }
+  // console.log(product.DTvalue);
+  var currDate = new Date()
+    const calculateTimeLeft = () => {
+        const difference = product.DTvalue - currDate.getTime();
+        let timeLeft = {};
+        if (difference > 0) {
+            timeLeft = {
+              hours: Math.floor(difference / (1000 * 60 * 60)),
+              minutes: Math.floor((difference / 1000 / 60) % 60),
+              seconds: Math.floor((difference / 1000) % 60),
+            };
+          }
+      
+          return timeLeft;      
+    };
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    console.log(timeLeft,"jeet");
+    useEffect(() => {
+        setTimeout(() => {
+          setTimeLeft(calculateTimeLeft());
+        }, 1000);
+      },[]);
 
   useEffect(() => {
     if (error) {
@@ -260,6 +282,7 @@ const ProductDetails = () => {
                       Hurry, Only {product.stock} left!
                     </span>
                   )}
+                  
                   {/* <!-- price desc --> */}
 
                   {/* <!-- banks offers --> */}
@@ -700,8 +723,17 @@ const ProductDetails = () => {
                     </span>
                   </div>
                   <span className="text-red-500 text-sm font-medium">
-                    Hurry, Up guys!
+                  <p>
+                    <span>{timeLeft.hours}</span>
+                    {/* {console.log(timeLeft.hours)} */}
+                    <span>:</span>
+                    <span>{timeLeft.minutes}</span>
+                    <span>:</span>
+                    <span>{timeLeft.seconds}</span>
+                  </p>
                   </span>
+                  
+
                   {/* <!-- price desc --> */}
 
                   {/* <!-- warranty & brand --> */}

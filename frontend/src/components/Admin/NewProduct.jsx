@@ -134,6 +134,7 @@ const NewProduct = () => {
     formData.set("type", type);
     formData.set("currentDateTime", new Date());
 
+    console.log(DTvalue.getTime);
     images.forEach((image) => {
       formData.append("images", image);
     });
@@ -148,6 +149,8 @@ const NewProduct = () => {
 
     dispatch(createProduct(formData));
   };
+
+  
 
   useEffect(() => {
     if (error) {

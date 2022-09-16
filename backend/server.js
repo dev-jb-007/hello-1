@@ -11,17 +11,17 @@ process.on('uncaughtException', (err) => {
 
 connectDatabase();
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// cloudinary.config({
+//     cloud_name: process.env.CLOUDINARY_NAME,
+//     api_key: process.env.CLOUDINARY_API_KEY,
+//     api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
-// cloudinary.config({ 
-//     cloud_name: 'jeetkaadda', 
-//     api_key: '495984587765571', 
-//     api_secret: 'flFwZKHJK7M_CkINq3ogHjVnVTs' 
-//   });
+cloudinary.config({ 
+    cloud_name: 'jeetkaadda', 
+    api_key: '495984587765571', 
+    api_secret: 'flFwZKHJK7M_CkINq3ogHjVnVTs' 
+  });
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)

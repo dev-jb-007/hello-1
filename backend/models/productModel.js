@@ -16,6 +16,9 @@ const productSchema = new mongoose.Schema({
             required: true
         }
     ],
+    content:{
+        type:String
+    },
     DTvalue:{
         type:String,
         required:true

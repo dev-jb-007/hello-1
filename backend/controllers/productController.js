@@ -3,7 +3,7 @@ const asyncErrorHandler = require('../middlewares/asyncErrorHandler');
 const SearchFeatures = require('../utils/searchFeatures');
 const ErrorHandler = require('../utils/errorHandler');
 const cloudinary = require('cloudinary');
-
+var request = require('request');
 // Get All Products
 exports.getAllProducts = asyncErrorHandler(async (req, res, next) => {
 
@@ -77,7 +77,7 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
     }
 
     const imagesLink = [];
-
+    let url;
     for (let i = 0; i < images.length; i++) {
         const result = await cloudinary.v2.uploader.upload(images[i], {
             folder: "products",
@@ -87,6 +87,7 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
             public_id: result.public_id,
             url: result.secure_url,
         });
+        url = result.secure_url;
     }
 
     const result = await cloudinary.v2.uploader.upload(req.body.logo, {
@@ -109,8 +110,20 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
         specs.push(JSON.parse(s))
     });
     req.body.specifications = specs;
-
     const product = await Product.create(req.body);
+    request.post(
+        'https://recommendationyouthclub.herokuapp.com/get-obj',
+        { json: { id: product._id, imageUrl: url } },
+        async function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                // body//
+                console.log(body.data);
+                product.content = body.data;
+                await product.save();
+            }
+        }
+    );
+
 
     res.status(201).json({
         success: true,
@@ -118,6 +131,37 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+
+//Get recommandation
+exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
+    let id = req.body.id;
+    let product = await Product.findById(id);
+    let maincategory = product.category;
+    let arr = await Product.find({ category: maincategory }, 'content _id');
+    let documents = [];
+    documents.push({
+        title: product._id,
+        text: product.content
+    })
+    let temp=product._id;
+    arr.forEach(item => {
+        if (item._id.toString() !==temp.toString() &&item.content) {
+            documents.push({
+                title: item._id,
+                text: item.content
+            })
+        }
+    })
+    request.post(
+        'https://recommendationyouthclub.herokuapp.com/get-recommandation',
+        { json: { array: documents } },
+        async function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body);
+                res.send(body.arr);
+            }
+    });
+});
 // Update Product ---ADMIN
 exports.updateProduct = asyncErrorHandler(async (req, res, next) => {
 
@@ -230,7 +274,7 @@ exports.createProductReview = asyncErrorHandler(async (req, res, next) => {
 
     if (isReviewed) {
 
-        product.reviews.forEach((rev) => { 
+        product.reviews.forEach((rev) => {
             if (rev.user.toString() === req.user._id.toString())
                 (rev.rating = rating, rev.comment = comment);
         });
