@@ -23,7 +23,7 @@ const ProductSliderOffers = ({ title, tagline }) => {
             {loading ? null :
                 <Slider {...settings} className="flex items-center justify-between p-1">
                     {products && getOfferProducts(products, 12).map((product) => (
-                        product.type === "Simple"?<Product {...product} key={product._id} />:<></>
+                        <Product {...product} key={product._id} />
                     ))}
                 </Slider>
             }
