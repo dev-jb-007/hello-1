@@ -17,5 +17,10 @@ export const getRandomProducts = (prodsArray, n) => {
 }
 
 export const getOfferProducts = (prodsArray,n) => {
-    return prodsArray.sort(() => prodsArray.cuttedPrice - prodsArray.price).slice(0,n)
+    return prodsArray.sort((a,b) => (a.cuttedPrice - a.price > b.cuttedPrice - b.price ? -1 : 1)).slice(0,n)
+    // return prodsArray.sort((a,b) => prodsArray.cuttedPrice - prodsArray.price).slice(0,n)
+}
+
+export const getTopProducts = (prodsArray) => {
+    return prodsArray.sort((a, b) => (a.views > b.views ? -1 : 1));
 }

@@ -80,7 +80,7 @@ exports.addService=asyncErrorHandler(async (req,res,next)=>{
 exports.getProductDetails = asyncErrorHandler(async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
-    Product.views++;
+    product.views++;
     await product.save();
     if (!product) {
         return next(new ErrorHandler("Product Not Found", 404));
@@ -154,6 +154,7 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
         async function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 // body//
+                console.log(body.data);
                 product.content = body.data;
                 await product.save();
             }
@@ -190,12 +191,13 @@ exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
             })
         }
     })
+    console.log(documents);
     request.post(
         'https://recommendationyouthclub.herokuapp.com/get-recommandation',
         { json: { array: documents } },
         async function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                // console.log(body);
+                console.log(body);
                 let shrey=[];
                 if(body.arr)
                 {

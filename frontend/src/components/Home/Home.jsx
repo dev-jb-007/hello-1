@@ -4,6 +4,7 @@ import Banner from './Banner/Banner';
 import DealSlider from './DealSlider/DealSlider';
 import ProductSlider from './ProductSlider/ProductSlider';
 import ProductSliderOffers from './ProductSlider/ProductSliderOffers';
+import ProductSliderTop from './ProductSlider/ProductSliderTop';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearErrors, getSliderProducts } from '../../actions/productAction';
 import { useSnackbar } from 'notistack';
@@ -35,6 +36,7 @@ const Home = () => {
         {!loading && <ProductSlider title={"Suggested for You"} tagline={"Based on Your Activity"} />}
         {!loading && <ProductSlider title={"You May Also Like..."} tagline={"Based on Your Interest"} />}
         <ProductSliderOffers title={"Top Offers On"} />
+        <ProductSliderTop title={"Most Viewd Products"} />
         {!loading && <ProductSlider title={"Don't Miss These!"} tagline={"Inspired by your order"} />}
       </main>
     </>
