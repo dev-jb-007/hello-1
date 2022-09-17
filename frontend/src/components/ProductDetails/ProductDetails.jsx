@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Slider from "react-slick";
+import { initializeApp } from "firebase/app"
+import { getDatabase, ref, onValue, set } from "firebase/database";
 import {
   clearErrors,
   getProductDetails,
@@ -11,6 +13,7 @@ import {
 } from "../../actions/productAction";
 import { NextBtn, PreviousBtn } from "../Home/Banner/Banner";
 import ProductSlider from "../Home/ProductSlider/ProductSlider";
+import ProductSliderSpecial from "../Home/ProductSlider/ProductSliderSpecial";
 import Loader from "../Layouts/Loader";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
@@ -30,73 +33,114 @@ import { NEW_REVIEW_RESET } from "../../constants/productConstants";
 import { addItemsToCart } from "../../actions/cartAction";
 import { getDeliveryDate, getDiscount } from "../../utils/functions";
 import Modal from "react-modal";
+import Product from "../Home/DealSlider/Product";
 import {
   addToWishlist,
   removeFromWishlist,
 } from "../../actions/wishlistAction";
 import MinCategory from "../Layouts/MinCategory";
 import MetaData from "../Layouts/MetaData";
-
+const firebaseConfig = {
+  apiKey: "AIzaSyCqJyW-mgSVClCOgHL6le8QwaaZHAIyeHU",
+  authDomain: "recommendationyouthclub.firebaseapp.com",
+  projectId: "recommendationyouthclub",
+  storageBucket: "recommendationyouthclub.appspot.com",
+  messagingSenderId: "520178963155",
+  appId: "1:520178963155:web:c12841dea58718d3f7fa26",
+};
 const ProductDetails = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const params = useParams();
   const navigate = useNavigate();
-
   // reviews toggle
   const [open, setOpen] = useState(false);
   const [viewAll, setViewAll] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [price, setPrice] = useState(0);
-
+  
   const { product, loading, error } = useSelector(
     (state) => state.productDetails
-  );
-  const { success, error: reviewError } = useSelector(
-    (state) => state.newReview
-  );
-  const { cartItems } = useSelector((state) => state.cart);
-  const { wishlistItems } = useSelector((state) => state.wishlist);
+    );
+    console.log(product)
+    const [price, setPrice] = useState(product.price);
+    
+    const writeUserData = (val, id) => {
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      set(ref(db, "auction/" + `${id}`), {
+        price: val,
+        productid: id,
+      });
+    };
+    const [realtimeprice, setrealtimeprice] = useState(null);
+    useEffect(() => {
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      const starCountRef = ref(db, "auction/" + `${product._id}`);
+      console.log(product);
+      onValue(starCountRef, async (snapshot) => {
+        const data = await snapshot.val();
+        setrealtimeprice(data?.price);
+        // console.log(data?.price);
+        // console.log(realtimeprice);
+        // updateStarCount(postElement, data);
+      });
+    }, [product]);
 
-  const settings = {
-    autoplay: true,
-    autoplaySpeed: 2000,
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    prevArrow: <PreviousBtn />,
-    nextArrow: <NextBtn />,
-  };
+    useEffect(()=>{
+      setrealtimeprice(realtimeprice)
+      console.log(realtimeprice,"changed");
+    },[realtimeprice])
 
-  const productId = params.id;
-  const itemInWishlist = wishlistItems.some((i) => i.product === productId);
+    useEffect(()=>{
+      setPrice(realtimeprice)
+    },[realtimeprice])
 
-  const addToWishlistHandler = () => {
-    if (itemInWishlist) {
-      dispatch(removeFromWishlist(productId));
-      enqueueSnackbar("Remove From Wishlist", { variant: "success" });
-    } else {
-      dispatch(addToWishlist(productId));
-      enqueueSnackbar("Added To Wishlist", { variant: "success" });
-    }
-  };
-
-  const reviewSubmitHandler = () => {
-    if (rating === 0 || !comment.trim()) {
-      enqueueSnackbar("Empty Review", { variant: "error" });
-      return;
-    }
-    const formData = new FormData();
-    formData.set("rating", rating);
-    formData.set("comment", comment);
-    formData.set("productId", productId);
-    dispatch(newReview(formData));
-    setOpen(false);
-  };
-
+    const { success, error: reviewError } = useSelector(
+      (state) => state.newReview
+      );
+      const { cartItems } = useSelector((state) => state.cart);
+      const { wishlistItems } = useSelector((state) => state.wishlist);
+      
+      const settings = {
+        autoplay: true,
+        autoplaySpeed: 2000,
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        prevArrow: <PreviousBtn />,
+        nextArrow: <NextBtn />,
+      };
+      
+      const productId = params.id;
+      const itemInWishlist = wishlistItems.some((i) => i.product === productId);
+      
+      const addToWishlistHandler = () => {
+        if (itemInWishlist) {
+          dispatch(removeFromWishlist(productId));
+          enqueueSnackbar("Remove From Wishlist", { variant: "success" });
+        } else {
+          dispatch(addToWishlist(productId));
+          enqueueSnackbar("Added To Wishlist", { variant: "success" });
+        }
+      };
+      
+      const reviewSubmitHandler = () => {
+        if (rating === 0 || !comment.trim()) {
+          enqueueSnackbar("Empty Review", { variant: "error" });
+          return;
+        }
+        const formData = new FormData();
+        formData.set("rating", rating);
+        formData.set("comment", comment);
+        formData.set("productId", productId);
+        dispatch(newReview(formData));
+        setOpen(false);
+      };
+      
   const addToCartHandler = () => {
     dispatch(addItemsToCart(productId));
     enqueueSnackbar("Product Added To Cart", { variant: "success" });
@@ -117,41 +161,43 @@ const ProductDetails = () => {
     navigate("/shipping");
   };
 
-  const bid = async ()=>{
-    console.log("function call")
-    const datas = {productId:productId,bidVal:price};
-    console.log(datas,"data")
+  const bid = async () => {
+    // console.log("function call")
+    const datas = { productId: productId, bidVal: price };
+    // console.log(datas, "data")
     const options = {
-        method:"POST",
-        headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify(datas),
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datas),
     }
-    const data = await fetch('/api/v1/updatebid',options);
+    const data = await fetch('/api/v1/updatebid', options);
     const parsedData = await data.json();
-    console.log(parsedData);
+    // console.log(parsedData);
   }
   // console.log(product.DTvalue);
   var currDate = new Date()
-    const calculateTimeLeft = () => {
-        const difference = product.DTvalue - currDate.getTime();
-        let timeLeft = {};
-        if (difference > 0) {
-            timeLeft = {
-              hours: Math.floor(difference / (1000 * 60 * 60)),
-              minutes: Math.floor((difference / 1000 / 60) % 60),
-              seconds: Math.floor((difference / 1000) % 60),
-            };
-          }
-      
-          return timeLeft;      
-    };
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-    console.log(timeLeft,"jeet");
-    useEffect(() => {
-        setTimeout(() => {
-          setTimeLeft(calculateTimeLeft());
-        }, 1000);
-      },[]);
+  const calculateTimeLeft = () => {
+    const difference = product.DTvalue - currDate.getTime();
+    let timeLeft = {};
+    if (difference > 0) {
+      timeLeft = {
+        hours: Math.floor(difference / (1000 * 60 * 60)),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timeLeft;
+  };
+  var timeLeft = calculateTimeLeft();
+
+  //   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  //   console.log(timeLeft,"jeet");
+  //   useEffect(() => {
+  //       setTimeout(() => {
+  //         setTimeLeft(calculateTimeLeft());
+  //       }, 1000);
+  //     },[]);
 
   useEffect(() => {
     if (error) {
@@ -173,7 +219,48 @@ const ProductDetails = () => {
   useEffect(() => {
     dispatch(getSimilarProducts(product?.category));
   }, [dispatch, product, product.category]);
+
   const [ismodal, setIsmodal] = useState(false);
+  const [products, setProducts] = useState([]);
+
+
+
+  const fetchImages = async (id) => {
+    const datas = { id }
+
+    // console.log(datas,"jeet")
+    const data = await fetch('/api/v1/get-recommandation', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datas)
+    });
+    const parsedData = await data.json();
+    // console.log("ids : ",parsedData)
+    const x = await fetchProductDetail(parsedData);
+    // console.log(x,"xxx");
+
+  }
+  // const temp=async (ids)=>
+  // {
+
+  // }
+  const fetchProductDetail = async (ids) => {
+    let arr = [];
+    for(let i=0;i<ids.length;i++)
+    {
+      const data = await fetch(`/api/v1/product/${ids[i]}`);
+      const parsedData = await data.json();
+      // console.log(parsedData.product,"Oza");
+      arr.push(parsedData.product);
+    }
+    // console.log(arr,"arr");
+    setProducts(arr);
+  }
+
+  useEffect(() => {
+    fetchImages(productId);
+  }, [])
+
   return (
     <>
       {loading ? (
@@ -205,11 +292,10 @@ const ProductDetails = () => {
                     <div className="absolute top-4 right-4 shadow-lg bg-white w-9 h-9 border flex items-center justify-center rounded-full">
                       <span
                         onClick={addToWishlistHandler}
-                        className={`${
-                          itemInWishlist
-                            ? "text-red-500"
-                            : "hover:text-red-500 text-gray-300"
-                        } cursor-pointer`}
+                        className={`${itemInWishlist
+                          ? "text-red-500"
+                          : "hover:text-red-500 text-gray-300"
+                          } cursor-pointer`}
                       >
                         <FavoriteIcon sx={{ fontSize: "18px" }} />
                       </span>
@@ -282,7 +368,7 @@ const ProductDetails = () => {
                       Hurry, Only {product.stock} left!
                     </span>
                   )}
-                  
+
                   {/* <!-- price desc --> */}
 
                   {/* <!-- banks offers --> */}
@@ -505,46 +591,46 @@ const ProductDetails = () => {
 
                     {viewAll
                       ? product.reviews
-                          ?.map((rev, i) => (
-                            <div
-                              className="flex flex-col gap-2 py-4 px-6 border-b"
-                              key={i}
-                            >
-                              <Rating
-                                name="read-only"
-                                value={rev.rating}
-                                readOnly
-                                size="small"
-                                precision={0.5}
-                              />
-                              <p>{rev.comment}</p>
-                              <span className="text-sm text-gray-500">
-                                by {rev.name}
-                              </span>
-                            </div>
-                          ))
-                          .reverse()
+                        ?.map((rev, i) => (
+                          <div
+                            className="flex flex-col gap-2 py-4 px-6 border-b"
+                            key={i}
+                          >
+                            <Rating
+                              name="read-only"
+                              value={rev.rating}
+                              readOnly
+                              size="small"
+                              precision={0.5}
+                            />
+                            <p>{rev.comment}</p>
+                            <span className="text-sm text-gray-500">
+                              by {rev.name}
+                            </span>
+                          </div>
+                        ))
+                        .reverse()
                       : product.reviews
-                          ?.slice(-3)
-                          .map((rev, i) => (
-                            <div
-                              className="flex flex-col gap-2 py-4 px-6 border-b"
-                              key={i}
-                            >
-                              <Rating
-                                name="read-only"
-                                value={rev.rating}
-                                readOnly
-                                size="small"
-                                precision={0.5}
-                              />
-                              <p>{rev.comment}</p>
-                              <span className="text-sm text-gray-500">
-                                by {rev.name}
-                              </span>
-                            </div>
-                          ))
-                          .reverse()}
+                        ?.slice(-3)
+                        .map((rev, i) => (
+                          <div
+                            className="flex flex-col gap-2 py-4 px-6 border-b"
+                            key={i}
+                          >
+                            <Rating
+                              name="read-only"
+                              value={rev.rating}
+                              readOnly
+                              size="small"
+                              precision={0.5}
+                            />
+                            <p>{rev.comment}</p>
+                            <span className="text-sm text-gray-500">
+                              by {rev.name}
+                            </span>
+                          </div>
+                        ))
+                        .reverse()}
                     {product.reviews?.length > 3 && (
                       <button
                         onClick={() => setViewAll(!viewAll)}
@@ -563,10 +649,20 @@ const ProductDetails = () => {
 
             {/* Sliders */}
             <div className="flex flex-col gap-3 mt-6">
-              <ProductSlider
+              {console.log(products,"jeet oza")}
+              {products.length===0 ? (<>{console.log("empty")}</>):(
+                <>
+                <ProductSliderSpecial
                 title={"Similar Products"}
                 tagline={"Based on the category"}
+                product={products}
               />
+              {console.log("non empty")}
+              </>
+              
+            
+              )}
+              
             </div>
           </main>
         </>
@@ -610,8 +706,9 @@ const ProductDetails = () => {
 
                 <div className="px-6 py-2 flex items-center text-sm">
                   <p className="text-gray-500 w-3/12">Current Value</p>
-                  <p className="flex-1">{product.price}</p>
+                  <p className="flex-1">{realtimeprice?.toLocaleString()}</p>
                 </div>
+                
                 <div className="px-6 py-2 flex items-center text-sm">
                   <p className="text-gray-500 w-3/12">Your Bid</p>
                   {/* <p className="flex-1">{product.price}</p> */}
@@ -629,6 +726,9 @@ const ProductDetails = () => {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
+                </div>
+                <div style={{color:"#900"}} className="px-6 py-2 flex items-center text-sm">
+                Bid value must be greater than current price
                 </div>
               </div>
               <div className="px-6 py-2 flex items-center text-sm">
@@ -648,7 +748,11 @@ const ProductDetails = () => {
                   style={{
                     margin: "5px",
                   }}
-                  onClick={bid}
+                  onClick={() => {
+                    writeUserData(price, product._id)
+                    bid();
+                    setIsmodal(!ismodal)
+                  }}
                   className={
                     "p-4 w-full flex items-center justify-center gap-2 text-white bg-red-600 rounded-sm shadow hover:shadow-lg"
                   }
@@ -683,11 +787,10 @@ const ProductDetails = () => {
                     <div className="absolute top-4 right-4 shadow-lg bg-white w-9 h-9 border flex items-center justify-center rounded-full">
                       <span
                         onClick={addToWishlistHandler}
-                        className={`${
-                          itemInWishlist
-                            ? "text-red-500"
-                            : "hover:text-red-500 text-gray-300"
-                        } cursor-pointer`}
+                        className={`${itemInWishlist
+                          ? "text-red-500"
+                          : "hover:text-red-500 text-gray-300"
+                          } cursor-pointer`}
                       >
                         <FavoriteIcon sx={{ fontSize: "18px" }} />
                       </span>
@@ -718,21 +821,24 @@ const ProductDetails = () => {
                 <div className="flex flex-col gap-2 mb-4">
                   <h2 className="text-xl">{product.name}</h2>
                   <div className="flex items-baseline gap-2 text-3xl font-medium">
-                    <span className="text-gray-800">
-                      ₹{product.price?.toLocaleString()}
+                    {loading?(<></>):(
+                      <span className="text-gray-800">
+                        {console.log(realtimeprice)}
+                      ₹{realtimeprice?.toLocaleString()}
                     </span>
+                    )}
                   </div>
                   <span className="text-red-500 text-sm font-medium">
-                  <p>
-                    <span>{timeLeft.hours}</span>
-                    {/* {console.log(timeLeft.hours)} */}
+                    <p>
+                      <span>{timeLeft.hours}</span> Hours left for auction
+                      {/* {console.log(timeLeft.hours)} */}
+                      {/* <span>:</span> */}
+                      {/* <span>{timeLeft.minutes}</span>
                     <span>:</span>
-                    <span>{timeLeft.minutes}</span>
-                    <span>:</span>
-                    <span>{timeLeft.seconds}</span>
-                  </p>
+                    <span>{timeLeft.seconds}</span> */}
+                    </p>
                   </span>
-                  
+
 
                   {/* <!-- price desc --> */}
 
@@ -937,46 +1043,46 @@ const ProductDetails = () => {
 
                     {viewAll
                       ? product.reviews
-                          ?.map((rev, i) => (
-                            <div
-                              className="flex flex-col gap-2 py-4 px-6 border-b"
-                              key={i}
-                            >
-                              <Rating
-                                name="read-only"
-                                value={rev.rating}
-                                readOnly
-                                size="small"
-                                precision={0.5}
-                              />
-                              <p>{rev.comment}</p>
-                              <span className="text-sm text-gray-500">
-                                by {rev.name}
-                              </span>
-                            </div>
-                          ))
-                          .reverse()
+                        ?.map((rev, i) => (
+                          <div
+                            className="flex flex-col gap-2 py-4 px-6 border-b"
+                            key={i}
+                          >
+                            <Rating
+                              name="read-only"
+                              value={rev.rating}
+                              readOnly
+                              size="small"
+                              precision={0.5}
+                            />
+                            <p>{rev.comment}</p>
+                            <span className="text-sm text-gray-500">
+                              by {rev.name}
+                            </span>
+                          </div>
+                        ))
+                        .reverse()
                       : product.reviews
-                          ?.slice(-3)
-                          .map((rev, i) => (
-                            <div
-                              className="flex flex-col gap-2 py-4 px-6 border-b"
-                              key={i}
-                            >
-                              <Rating
-                                name="read-only"
-                                value={rev.rating}
-                                readOnly
-                                size="small"
-                                precision={0.5}
-                              />
-                              <p>{rev.comment}</p>
-                              <span className="text-sm text-gray-500">
-                                by {rev.name}
-                              </span>
-                            </div>
-                          ))
-                          .reverse()}
+                        ?.slice(-3)
+                        .map((rev, i) => (
+                          <div
+                            className="flex flex-col gap-2 py-4 px-6 border-b"
+                            key={i}
+                          >
+                            <Rating
+                              name="read-only"
+                              value={rev.rating}
+                              readOnly
+                              size="small"
+                              precision={0.5}
+                            />
+                            <p>{rev.comment}</p>
+                            <span className="text-sm text-gray-500">
+                              by {rev.name}
+                            </span>
+                          </div>
+                        ))
+                        .reverse()}
                     {product.reviews?.length > 3 && (
                       <button
                         onClick={() => setViewAll(!viewAll)}
@@ -995,11 +1101,23 @@ const ProductDetails = () => {
 
             {/* Sliders */}
             <div className="flex flex-col gap-3 mt-6">
-              <ProductSlider
+              {console.log(products,"jeet oza")}
+              {products.length===0 ? (<>{console.log("empty")}</>):(
+                <>
+                <ProductSliderSpecial
                 title={"Similar Products"}
                 tagline={"Based on the category"}
+                product={products}
               />
+              {console.log("non empty")}
+              </>
+              
+            
+              )}
+              
             </div>
+
+
           </main>
         </>
       )}

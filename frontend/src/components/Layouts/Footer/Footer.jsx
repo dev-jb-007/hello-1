@@ -23,16 +23,8 @@ const footerLinks = [
         redirect: "https://www.flipkartcareers.com",
       },
       {
-        name: "Flipkart Stories",
-        redirect: "https://stories.flipkart.com",
-      },
-      {
         name: "Press",
         redirect: "https://stories.flipkart.com/category/top-stories/news",
-      },
-      {
-        name: "Flipkart Wholesale",
-        redirect: "https://www.flipkartwholesale.com",
       },
       {
         name: "Corporate Information",
@@ -141,7 +133,7 @@ const Footer = () => {
             <div className="w-full sm:w-5/12 my-6 mx-5 sm:mx-0 flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between">
               <div className="w-full sm:w-1/2">
                 <h2 className="text-primary-grey">Mail Us:</h2>
-                <p className="mt-2 leading-5">Flipkart Internet Private Limited,<br />
+                <p className="mt-2 leading-5">SingChana Internet Private Limited,<br />
                   Buildings Alyssa, Begonia &<br />
                   Clove Embassy Tech Village,<br />
                   Outer Ring Road, Devarabeesanahalli Village,<br />
@@ -152,7 +144,7 @@ const Footer = () => {
 
               <div className="w-full sm:w-1/2">
                 <h2 className="text-primary-grey">Registered Office Address:</h2>
-                <p className="mt-2 leading-5">Flipkart Internet Private Limited,<br />
+                <p className="mt-2 leading-5">SingChana Internet Private Limited,<br />
                   Buildings Alyssa, Begonia &<br />
                   Clove Embassy Tech Village,<br />
                   Outer Ring Road, Devarabeesanahalli Village,<br />
@@ -169,7 +161,7 @@ const Footer = () => {
 
           <div className="px-16 py-6 w-full bg-primary-darkBlue hidden sm:flex justify-between items-center text-sm text-white">
             <a href="https://seller.flipkart.com/sell-online" target="_blank" rel="noreferrer" className="flex items-center gap-2">
-              <span className="text-yellow-400"><WorkIcon sx={{ fontSize: "20px" }} /></span> Sell On Flipkart
+              <span className="text-yellow-400"><WorkIcon sx={{ fontSize: "20px" }} /></span> Sell On SingChana
             </a>
             <a href="https://brands.flipkart.com" target="_blank" rel="noreferrer" className="flex items-center gap-2">
               <span className="text-yellow-400"><StarsIcon sx={{ fontSize: "20px" }} /></span> Advertise
@@ -180,8 +172,6 @@ const Footer = () => {
             <a href="https://www.flipkart.com/helpcentre" target="_blank" rel="noreferrer" className="flex items-center gap-2">
               <span className="text-yellow-400"><HelpIcon sx={{ fontSize: "20px" }} /></span> Help Center
             </a>
-
-            <span>&copy; 2007-{new Date().getFullYear()} Flipkart.com</span>
             <img draggable="false" src={paymentMethods} alt="Card Payment" />
           </div>
         </>

@@ -13,7 +13,7 @@ const SecondaryDropDownMenu = () => {
             redirect: "https://www.flipkart.com/communication-preferences/push",
         },
         {
-            title: "Sell on Flipkart",
+            title: "Sell on SingChana",
             icon: <BusinessCenterIcon sx={{ fontSize: "18px" }} />,
             redirect: "https://seller.flipkart.com/sell-online",
         },
@@ -35,7 +35,7 @@ const SecondaryDropDownMenu = () => {
     ]
 
     return (
-        <div className="absolute w-60 -right-2 top-9 bg-white shadow-2xl rounded flex-col text-sm">
+        <div className="absolute w-60 top-9 bg-white shadow-2xl rounded flex-col text-sm">
 
             {navs.map((item, i) => {
 

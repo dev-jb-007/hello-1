@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: [true, "Please enter service name"],
         trim: true
@@ -10,12 +10,24 @@ const serviceSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please enter service description"]
     },
-    requirements:{
-        type:String
+    requirements:[
+        {
+            key:String,
+            value:Number
+        }
+    ],
+    cost:{
+        type:Number,
+        required:true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    purchasedBy: {
+        type: String,
+        required:true
+    },
+    contactTo:Number,
+    Status:{
+        type:Boolean,
+        default:false
     }
 });
 

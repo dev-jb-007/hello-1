@@ -11,39 +11,39 @@ import { Link } from 'react-router-dom';
 
 const catNav = [
     {
-        name: "Mobiles",
+        name: "Pots",
         icon: mobiles,
     },
     {
-        name: "Fashion",
+        name: "Jewellery",
         icon: fashion,
     },
     {
-        name: "Electronics",
+        name: "Embroidery",
         icon: electronics,
     },
     {
-        name: "Home",
+        name: "Decor",
         icon: home,
     },
     {
-        name: "Travel",
+        name: "Handicraft",
         icon: travel,
     },
     {
-        name: "Appliances",
+        name: "Toys",
         icon: appliances,
     },
     {
-        name: "Furniture",
+        name: "Candles",
         icon: furniture,
     },
     {
-        name: "Beauty,Toys & more",
+        name: "Tools",
         icon: beauty,
     },
     {
-        name: "Grocery",
+        name: "Clothes",
         icon: grocery,
     },
 ]

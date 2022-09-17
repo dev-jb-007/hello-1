@@ -3,6 +3,25 @@ const asyncErrorHandler = require('../middlewares/asyncErrorHandler');
 const SearchFeatures = require('../utils/searchFeatures');
 const ErrorHandler = require('../utils/errorHandler');
 const cloudinary = require('cloudinary');
+const { initializeApp }=require('firebase/app');
+const { getDatabase, ref, onValue, set }=require("firebase/database");
+const firebaseConfig = {
+    apiKey: "AIzaSyCqJyW-mgSVClCOgHL6le8QwaaZHAIyeHU",
+    authDomain: "recommendationyouthclub.firebaseapp.com",
+    projectId: "recommendationyouthclub",
+    storageBucket: "recommendationyouthclub.appspot.com",
+    messagingSenderId: "520178963155",
+    appId: "1:520178963155:web:c12841dea58718d3f7fa26",
+  };
+  const app = initializeApp(firebaseConfig);
+  const writeUserData =async (product,id) => {
+    const db = getDatabase(app);
+    set(ref(db, "auction/" + `${id}`), {
+      price: product.price,
+      productid: id,
+    });
+  };
+  
 var request = require('request');
 // Get All Products
 exports.getAllProducts = asyncErrorHandler(async (req, res, next) => {
@@ -34,7 +53,6 @@ exports.getAllProducts = asyncErrorHandler(async (req, res, next) => {
 // Get All Products ---Product Sliders
 exports.getProducts = asyncErrorHandler(async (req, res, next) => {
     const products = await Product.find();
-
     res.status(200).json({
         success: true,
         products,
@@ -45,7 +63,9 @@ exports.getProducts = asyncErrorHandler(async (req, res, next) => {
 exports.getProductDetails = asyncErrorHandler(async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
-
+    console.log("---------------------------------")
+    console.log(product)
+    console.log("---------------------------------")
     if (!product) {
         return next(new ErrorHandler("Product Not Found", 404));
     }
@@ -111,13 +131,13 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
     });
     req.body.specifications = specs;
     const product = await Product.create(req.body);
+    await writeUserData(product,product._id.toString());
     request.post(
         'https://recommendationyouthclub.herokuapp.com/get-obj',
         { json: { id: product._id, imageUrl: url } },
         async function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 // body//
-                console.log(body.data);
                 product.content = body.data;
                 await product.save();
             }
@@ -136,6 +156,7 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
 exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
     let id = req.body.id;
     let product = await Product.findById(id);
+    // console.log(product);
     let maincategory = product.category;
     let arr = await Product.find({ category: maincategory }, 'content _id');
     let documents = [];
@@ -157,8 +178,13 @@ exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
         { json: { array: documents } },
         async function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                console.log(body);
-                res.send(body.arr);
+                // console.log(body);
+                let shrey=[];
+                body.arr.forEach(item=>{
+                    // let temp=await Product.findById(item.document.)
+                    shrey.push(item.document.title);
+                })
+                res.send(shrey);
             }
     });
 });
