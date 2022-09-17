@@ -36,6 +36,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "user",
     },
+    workers:[
+      {
+        name:{
+            type:String
+        },
+        phone:{
+            type:Number
+        },
+        imageUrl:{
+            type:String
+        }
+      }  
+    ],
     createdAt: {
         type: Date,
         default: Date.now,

@@ -381,7 +381,7 @@ const ProductDetails = () => {
                           <LocalOfferIcon sx={{ fontSize: "20px" }} />
                         </span>
                         <span className="font-medium ml-2">Bank Offer</span> 15%
-                        Instant discount on first Flipkart Pay Later order of
+                        Instant discount on first Sing Chana Pay Later order of
                         500 and above{" "}
                         <Link className="text-primary-blue font-medium" to="/">
                           T&C
@@ -474,14 +474,14 @@ const ProductDetails = () => {
                   {/* <!-- seller details --> */}
 
                   {/* <!-- flipkart plus banner --> */}
-                  <div className="sm:w-1/2 mt-4 border">
+                  {/* <div className="sm:w-1/2 mt-4 border">
                     <img
                       draggable="false"
                       className="w-full h-full object-contain"
                       src="https://rukminim1.flixcart.com/lockin/763/305/images/promotion_banner_v2_active.png"
                       alt=""
                     />
-                  </div>
+                  </div> */}
                   {/* <!-- flipkart plus banner --> */}
 
                   {/* <!-- description details --> */}
@@ -926,14 +926,14 @@ const ProductDetails = () => {
                   {/* <!-- seller details --> */}
 
                   {/* <!-- flipkart plus banner --> */}
-                  <div className="sm:w-1/2 mt-4 border">
+                  {/* <div className="sm:w-1/2 mt-4 border">
                     <img
                       draggable="false"
                       className="w-full h-full object-contain"
                       src="https://rukminim1.flixcart.com/lockin/763/305/images/promotion_banner_v2_active.png"
                       alt=""
                     />
-                  </div>
+                  </div> */}
                   {/* <!-- flipkart plus banner --> */}
 
                   {/* <!-- description details --> */}

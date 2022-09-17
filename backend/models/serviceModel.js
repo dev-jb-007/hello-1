@@ -12,8 +12,8 @@ const serviceSchema = new mongoose.Schema({
     },
     requirements:[
         {
-            key:String,
-            value:Number
+            title:String,
+            description:String
         }
     ],
     cost:{
@@ -22,12 +22,12 @@ const serviceSchema = new mongoose.Schema({
     },
     purchasedBy: {
         type: String,
-        required:true
     },
     contactTo:Number,
     Status:{
+        required:true,
+        default:true,
         type:Boolean,
-        default:false
     }
 });
 

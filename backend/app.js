@@ -10,7 +10,7 @@ const app = express();
 // if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
     // }
-    console.log(process.env.NODE_ENV)
+    // console.log(process.env.NODE_ENV)
 
 app.use(express.json());
 app.use(cookieParser());

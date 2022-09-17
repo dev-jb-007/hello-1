@@ -37,6 +37,11 @@ const navMenu = [
     },
     {
         icon: <AddBoxIcon />,
+        label: "Add Worker",
+        ref: "/admin/new_worker",
+    },
+    {
+        icon: <AddBoxIcon />,
         label: "Add Service",
         ref: "/admin/new_service",
     },

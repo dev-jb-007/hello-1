@@ -12,6 +12,7 @@ import { categories } from "../../utils/constants";
 import MetaData from "../Layouts/MetaData";
 import BackdropLoader from "../Layouts/BackdropLoader";
 import DateTimePicker from "react-datetime-picker";
+import WorkerTable from "./WorkerTable";
 const NewProduct = () => {
   const [DTvalue, onChange] = useState(new Date());
   const dispatch = useDispatch();
@@ -27,14 +28,14 @@ const NewProduct = () => {
   });
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [requirements, setRequirements] = useState([]);
-  const [cost, setCost] = useState(0);
-  const [purchasedBy, setPurchasedBy] = useState("");
+//   const [description, setDescription] = useState("");
+//   const [requirements, setRequirements] = useState([]);
+//   const [cost, setCost] = useState(0);
+//   const [purchasedBy, setPurchasedBy] = useState("");
   const [contactTo, setContactTo] = useState(0);
-  const [status, setStatus] = useState(false);
-  //   const [images, setImages] = useState([]);
-  //   const [imagesPreview, setImagesPreview] = useState([]);
+//   const [status, setStatus] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState([]);
 
   const handleSpecsChange = (e) => {
     setRequireInput({ ...requireInput, [e.target.name]: e.target.value });
@@ -50,75 +51,95 @@ const NewProduct = () => {
     setRequired(required.filter((s, i) => i !== index));
   };
 
+  
 
+  const handleProductImageChange = (e) => {
+    const files = Array.from(e.target.files);
 
-  // const handleProductImageChange = (e) => {
-  //   const files = Array.from(e.target.files);
+    setImages([]);
+    setImagesPreview([]);
 
-  //   setImages([]);
-  //   setImagesPreview([]);
+    files.forEach((file) => {
+      const reader = new FileReader();
 
-  //   files.forEach((file) => {
-  //     const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImagesPreview((oldImages) => [...oldImages, reader.result]);
+          setImages((oldImages) => [...oldImages, reader.result]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
-  //     reader.onload = () => {
-  //       if (reader.readyState === 2) {
-  //         setImagesPreview((oldImages) => [...oldImages, reader.result]);
-  //         setImages((oldImages) => [...oldImages, reader.result]);
-  //       }
-  //     };
-  //     reader.readAsDataURL(file);
-  //   });
-  // };
+  const [worker,setWorker] = useState([]);
 
-  const newProductSubmitHandler =async (e) => {
+  const fetchWorker = async()=>{
+    const data = await fetch('../api/v1/get-worker');
+    const parsedData = await data.json();
+    setWorker(parsedData);
+  }
+
+  useEffect(()=>{
+    fetchWorker();
+  },[])
+
+  const newProductSubmitHandler = async (e) => {
+    console.log("submitted")
     e.preventDefault();
 
-    // required field checks
-
-
-    if (required.length <= 1) {
-      enqueueSnackbar("Add Minimum 2 Specifications", { variant: "warning" });
-      return;
+    const x = {
+        name:title,
+        phone:contactTo,
+        // proof:images
     }
+
+    const data = await fetch('../api/v1/add-worker',{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(x)
+    });
+    const parsedData = await data.json();
+    // console.log(parsedData);
+    setTitle("");
+    setContactTo(0);
+    setImages([]);
+    setWorker(parsedData);
+    
+
+    // required field checks
+    
+    
+    // if (required.length <= 1) {
+    //   enqueueSnackbar("Add Minimum 2 Specifications", { variant: "warning" });
+    //   return;
+    // }
     // if (images.length <= 0) {
     //   enqueueSnackbar("Add Product Images", { variant: "warning" });
     //   return;
     // }
 
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    formData.set("title", title);
-    formData.set("description", description);
-    formData.set("cost", cost);
-    formData.set("requirements", requirements);
-    formData.set("purchasedBy", "");
-    formData.set("contactTo", contactTo);
-    // images.forEach((image) => {
-    //   formData.append("images", image);
-    // });
-    const x = {
-      title,
-      description,
-      cost,
-      requirements:required,
-      purchasedBy: "",
-      contactTo,
-    }
-    // console.log(required)
-      required.forEach((s) => {
-        formData.append("requirements", JSON.stringify(s));
-      });
-    const data = await fetch('../api/v1/add-service', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(x)
-    });
-    const parsedData = await data.json();
+    // formData.set("title", title);
+    // // formData.set("description", description);
+    // // formData.set("cost", cost);
+    // // formData.set("requirements", requirements);
+    // // formData.set("purchasedBy", "");
+    // formData.set("contactTo", contactTo);
+
+    // // images.forEach((image) => {
+    // //   formData.append("images", image);
+    // // });
+
+    // // required.forEach((s) => {
+    // //   formData.append("requirements", JSON.stringify(s));
+    // // });
+
     // dispatch(createProduct(formData));
   };
 
-
+  
 
   useEffect(() => {
     if (error) {
@@ -134,9 +155,10 @@ const NewProduct = () => {
 
   return (
     <>
-      <MetaData title="Admin: New Product" />
+      <MetaData title="Admin: New Product | Flipkart" />
 
       {loading && <BackdropLoader />}
+      
       <form
         onSubmit={newProductSubmitHandler}
         encType="multipart/form-data"
@@ -152,32 +174,6 @@ const NewProduct = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <TextField
-            label="Description"
-            multiline
-            rows={3}
-            required
-            variant="outlined"
-            size="small"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <div className="flex justify-between">
-            <TextField
-              label="Cost"
-              type="number"
-              variant="outlined"
-              size="small"
-              InputProps={{
-                inputProps: {
-                  min: 0,
-                },
-              }}
-              required
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-            />
-          </div>
 
           <h2 className="font-medium">Contact Details</h2>
           <div className="flex justify-between gap-4 items-start">
@@ -190,40 +186,12 @@ const NewProduct = () => {
               value={contactTo}
               onChange={(e) => setContactTo(e.target.value)}
             />
-
-
+            
+            
           </div>
-        </div>
+          </div>
         <div className="flex flex-col gap-2 m-2 sm:w-1/2">
-          <h2 className="font-medium">Requirements</h2>
-
-          <div className="flex justify-evenly gap-2 items-center">
-            <TextField
-              value={requireInput.title}
-              onChange={handleSpecsChange}
-              name="title"
-              label="Name"
-              placeholder="Model No"
-              variant="outlined"
-              size="small"
-            />
-            <TextField
-              value={requireInput.description}
-              onChange={handleSpecsChange}
-              name="description"
-              label="Description"
-              placeholder="WJDK42DF5"
-              variant="outlined"
-              size="small"
-            />
-            <span
-              onClick={() => addSpecs()}
-              className="py-2 px-6 bg-primary-blue text-white rounded hover:shadow-lg cursor-pointer"
-            >
-              Add
-            </span>
-          </div>
-
+          
           <div className="flex flex-col gap-1.5">
             {required.map((spec, i) => (
               <div className="flex justify-between items-center text-sm rounded bg-blue-50 py-1 px-2">
@@ -239,7 +207,7 @@ const NewProduct = () => {
             ))}
           </div>
 
-          {/* <h2 className="font-medium">Product Images</h2>
+          <h2 className="font-medium">Upload Worker Photo</h2>
           <div className="flex gap-2 overflow-x-auto h-32 border rounded">
             {imagesPreview.map((image, i) => (
               <img
@@ -250,8 +218,8 @@ const NewProduct = () => {
                 className="w-full h-full object-contain"
               />
             ))}
-          </div> */}
-          {/* <label className="rounded font-medium bg-gray-400 text-center cursor-pointer text-white p-2 shadow hover:shadow-lg my-2">
+          </div>
+          <label className="rounded font-medium bg-gray-400 text-center cursor-pointer text-white p-2 shadow hover:shadow-lg my-2">
             <input
               type="file"
               name="images"
@@ -261,7 +229,7 @@ const NewProduct = () => {
               className="hidden"
             />
             Choose Files
-          </label> */}
+          </label>
 
           <div className="flex justify-end">
             <input
@@ -273,6 +241,8 @@ const NewProduct = () => {
           </div>
         </div>
       </form>
+      {console.log(worker,"jeet")}
+      <WorkerTable worker={worker}/>
     </>
   );
 };

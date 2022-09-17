@@ -15,3 +15,7 @@ export const formatDate = (dt) => {
 export const getRandomProducts = (prodsArray, n) => {
     return prodsArray.sort(() => 0.5 - Math.random()).slice(0, n)
 }
+
+export const getOfferProducts = (prodsArray,n) => {
+    return prodsArray.sort(() => prodsArray.cuttedPrice - prodsArray.price).slice(0,n)
+}

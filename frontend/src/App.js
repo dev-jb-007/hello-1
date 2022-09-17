@@ -31,6 +31,7 @@ import OrderTable from './components/Admin/OrderTable';
 import UpdateOrder from './components/Admin/UpdateOrder';
 import ProductTable from './components/Admin/ProductTable';
 import NewProduct from './components/Admin/NewProduct';
+import NewWorker from './components/Admin/NewWorker';
 import NewService from './components/Admin/NewService';
 import UpdateProduct from './components/Admin/UpdateProduct';
 import UserTable from './components/Admin/UserTable';
@@ -208,9 +209,17 @@ function App() {
           </ProtectedRoute>
         } ></Route>
 
-        <Route path="/admin/new_service" element={
+        <Route path="/admin/new_worker" element={
           <ProtectedRoute isAdmin={true}>
             <Dashboard activeTab={4}>
+              <NewWorker />
+            </Dashboard>
+          </ProtectedRoute>
+        } ></Route>
+
+        <Route path="/admin/new_service" element={
+          <ProtectedRoute isAdmin={true}>
+            <Dashboard activeTab={5}>
               <NewService />
             </Dashboard>
           </ProtectedRoute>
@@ -226,7 +235,7 @@ function App() {
 
         <Route path="/admin/users" element={
           <ProtectedRoute isAdmin={true}>
-            <Dashboard activeTab={5}>
+            <Dashboard activeTab={6}>
               <UserTable />
             </Dashboard>
           </ProtectedRoute>
@@ -234,7 +243,7 @@ function App() {
 
         <Route path="/admin/user/:id" element={
           <ProtectedRoute isAdmin={true}>
-            <Dashboard activeTab={5}>
+            <Dashboard activeTab={6}>
               <UpdateUser />
             </Dashboard>
           </ProtectedRoute>
@@ -242,7 +251,7 @@ function App() {
 
         <Route path="/admin/reviews" element={
           <ProtectedRoute isAdmin={true}>
-            <Dashboard activeTab={6}>
+            <Dashboard activeTab={7}>
               <ReviewsTable />
             </Dashboard>
           </ProtectedRoute>

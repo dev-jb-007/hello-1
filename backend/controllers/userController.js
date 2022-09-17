@@ -6,9 +6,37 @@ const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary');
 
+//get workers
+exports.getWorkers=asyncErrorHandler(async (req,res,next)=>{
+    res.send(req.user.workers);
+})
+//Add Workers
+exports.addWorkers=asyncErrorHandler(async (req,res,next)=>{
+    // const myCloud = await cloudinary.v2.uploader.upload(req.body.proof[0], {
+    //     folder: "workers",
+    //     width: 150,
+    //     crop: "scale",
+    // });
+    // console.log(req.body);
+    req.user.workers.push({
+        name:req.body.name,
+        phone:req.body.phone,
+        // imageUrl:myCloud.secure_url
+    })
+    // console.log(req.user.workers);
+    await req.user.save();
+    let arr=[];
+    req.user.workers.forEach(item=>{
+        arr.push({
+            name:item.name,
+            phone:item.phone
+        })
+    });
+    res.send(arr);
+})
 // Register User
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
-    console.log("hello");
+    // console.log("hello");
     const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
         folder: "avatars",
         width: 150,
@@ -27,7 +55,7 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
             url: myCloud.secure_url,
         },
     });
-    console.log(user);
+    // console.log(user);
     sendToken(user, 201, res);
     await user.save();
 });

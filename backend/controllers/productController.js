@@ -4,6 +4,7 @@ const SearchFeatures = require('../utils/searchFeatures');
 const ErrorHandler = require('../utils/errorHandler');
 const cloudinary = require('cloudinary');
 const { initializeApp }=require('firebase/app');
+const Service=require('../models/serviceModel');
 const { getDatabase, ref, onValue, set }=require("firebase/database");
 const firebaseConfig = {
     apiKey: "AIzaSyCqJyW-mgSVClCOgHL6le8QwaaZHAIyeHU",
@@ -59,13 +60,28 @@ exports.getProducts = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
+//Get Services
+exports.getService=asyncErrorHandler(async (req,res,next)=>{
+    let services=await Service.find();
+    res.send(services);
+})
+
+
+// Add Serviced
+exports.addService=asyncErrorHandler(async (req,res,next)=>{
+    // console.log()
+    // console.log(req.body);
+    let service = await Service.create(req.body);
+    res.send(service);
+})
+
+
 // Get Product Details
 exports.getProductDetails = asyncErrorHandler(async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
-    console.log("---------------------------------")
-    console.log(product)
-    console.log("---------------------------------")
+    Product.views++;
+    await product.save();
     if (!product) {
         return next(new ErrorHandler("Product Not Found", 404));
     }
@@ -122,7 +138,7 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
         name: req.body.brandname,
         logo: brandLogo
     }
-    req.body.images = imagesLink;
+    req.body.images = imagesLink; 
     req.body.user = req.user.id;
 
     let specs = [];
@@ -159,6 +175,7 @@ exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
     // console.log(product);
     let maincategory = product.category;
     let arr = await Product.find({ category: maincategory }, 'content _id');
+    // console.log("arr:- ",arr);
     let documents = [];
     documents.push({
         title: product._id,
@@ -180,10 +197,13 @@ exports.getRecommandation = asyncErrorHandler(async (req, res, next) => {
             if (!error && response.statusCode == 200) {
                 // console.log(body);
                 let shrey=[];
-                body.arr.forEach(item=>{
-                    // let temp=await Product.findById(item.document.)
-                    shrey.push(item.document.title);
-                })
+                if(body.arr)
+                {
+                    body.arr.forEach(item=>{
+                        // let temp=await Product.findById(item.document.)
+                        shrey.push(item.document.title);
+                    })
+                }
                 res.send(shrey);
             }
     });

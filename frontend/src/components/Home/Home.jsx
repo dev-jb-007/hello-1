@@ -3,6 +3,7 @@ import Categories from '../Layouts/Categories';
 import Banner from './Banner/Banner';
 import DealSlider from './DealSlider/DealSlider';
 import ProductSlider from './ProductSlider/ProductSlider';
+import ProductSliderOffers from './ProductSlider/ProductSliderOffers';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearErrors, getSliderProducts } from '../../actions/productAction';
 import { useSnackbar } from 'notistack';
@@ -29,11 +30,11 @@ const Home = () => {
       <Categories />
       <main className="flex flex-col gap-3 px-2 mt-16 sm:mt-2">
         <Banner />
-        <DealSlider title={"Discounts for You"} />
+        {/* <DealSlider title={"Discounts for You"} /> */}
+        <ProductSliderOffers title={"Discounts for you"} />
         {!loading && <ProductSlider title={"Suggested for You"} tagline={"Based on Your Activity"} />}
-        <DealSlider title={"Top Brands, Best Price"} />
         {!loading && <ProductSlider title={"You May Also Like..."} tagline={"Based on Your Interest"} />}
-        <DealSlider title={"Top Offers On"} />
+        <ProductSliderOffers title={"Top Offers On"} />
         {!loading && <ProductSlider title={"Don't Miss These!"} tagline={"Inspired by your order"} />}
       </main>
     </>
