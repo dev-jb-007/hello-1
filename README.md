@@ -1,7 +1,8 @@
 # Youth Conclave
 
 ## 🖥️ Tech Stack
-Demo :- https://drive.google.com/drive/u/0/my-drive?q=type:video%20parent:0AKQdvr56Pt7MUk9PVA
+
+Demo :- https://drive.google.com/file/d/1-5H8ceSW5hzBWV9F3_qlkD7IZRyRsZzB/view?usp=sharing
 **Frontend:**
 
 ![reactjs](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)&nbsp;
